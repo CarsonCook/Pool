@@ -1,11 +1,11 @@
-package marcook_pool.pool_finder.ui;
+package marcook_pool.pool_finder.util;
+
+import com.google.firebase.database.IgnoreExtraProperties;
 
 /**
  * Created by ryan on 18/09/16.
+ * Represents a single pool table in the Firebase Cloud database. Holds all of the information needed.
  */
-import com.google.firebase.database.IgnoreExtraProperties;
-
-// [START blog_user_class]
 @IgnoreExtraProperties
 public class PoolTable {
     public int ID;
@@ -16,17 +16,6 @@ public class PoolTable {
     public float rating;
 
     public PoolTable() {
-
-    }
-
-    public PoolTable(int ID, String photoURL, String establishment, String location, String description, int rating)
-    {
-        this.ID = ID;
-        this.photoURL = photoURL;
-        this.establishment = establishment;
-        this.location = location;
-        this.description = description;
-        this.rating = rating;
     }
 
     public String getEstablishment() {

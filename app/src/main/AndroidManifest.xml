@@ -20,7 +20,7 @@
         </activity>
         <activity android:name=".activites.SettingsActivity">
         </activity>
-        <activity android:name=".activites.OnePoolLocationActivity">
+        <activity android:name=".activites.TableInformationActivity">
         </activity>
         <activity
             android:name="com.stormpath.sdk.ui.StormpathLoginActivity"

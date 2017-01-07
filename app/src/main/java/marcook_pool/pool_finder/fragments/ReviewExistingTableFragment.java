@@ -1,6 +1,5 @@
 package marcook_pool.pool_finder.fragments;
 
-import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,13 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import marcook_pool.pool_finder.R;
-import marcook_pool.pool_finder.ui.RecyclerViewHolder;
+import marcook_pool.pool_finder.util.RecyclerViewHolder;
 
 /**
  * Created by Carson on 17/10/2016.
+ * Screen for user to review an existing pool table in the database.
+ * Attached to TableInformationActivity.
  */
-
-@TargetApi(23)
 public class ReviewExistingTableFragment extends Fragment {
 
     private TextView mTable;
@@ -34,29 +33,36 @@ public class ReviewExistingTableFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_review_existing, container, false);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setViews();
+        View v = inflater.inflate(R.layout.fragment_review_existing, container, false);
+        setViews(v);
         setOnClickListeners();
+        return v;
     }
 
-    void setViews() {
-        mTable = (TextView) getView().findViewById(R.id.establishment);
-        mDescription = (EditText) getView().findViewById(R.id.description);
-        mPhoto = (Button) getView().findViewById(R.id.add_photo_button);
-        mSubmit = (Button) getView().findViewById(R.id.submit);
-        mRating = (RatingBar) getView().findViewById(R.id.rating_bar);
-        mImage = (ImageView) getView().findViewById(R.id.photo);
+    /**
+     * Used to attach the UI variables to elements in the XML layout.
+     * Used to cleanup code, called from onCreateView().
+     *
+     * @param v View used to find the XML layout's elements.
+     */
+    private void setViews(View v) {
+        //get views from XML
+        mTable = (TextView) v.findViewById(R.id.establishment);
+        mDescription = (EditText) v.findViewById(R.id.description);
+        mPhoto = (Button) v.findViewById(R.id.add_photo_button);
+        mSubmit = (Button) v.findViewById(R.id.submit);
+        mRating = (RatingBar) v.findViewById(R.id.rating_bar);
+        mImage = (ImageView) v.findViewById(R.id.photo);
 
+        //set the title of the table
         mTable.setText(getArguments().getString(RecyclerViewHolder.KEY_ESTABLISHMENT));
     }
 
-    void setOnClickListeners() {
+    /**
+     * Used to set onClickListeners for each button.
+     * Used to cleanup code, called from onCreateView().
+     */
+    private void setOnClickListeners() {
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

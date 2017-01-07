@@ -1,7 +1,7 @@
 package marcook_pool.pool_finder.activites;
 
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Layout;
@@ -22,33 +22,36 @@ import com.stormpath.sdk.models.StormpathError;
 import com.stormpath.sdk.models.UserProfile;
 import com.stormpath.sdk.ui.StormpathLoginActivity;
 
-import marcook_pool.pool_finder.fragments.PoolLocationsFragment;
+import marcook_pool.pool_finder.fragments.TablesListFragment;
 import marcook_pool.pool_finder.R;
-import marcook_pool.pool_finder.fragments.SubmitLocationFragment;
+import marcook_pool.pool_finder.fragments.SubmitTableFragment;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
+/**
+ * Main screen in app, has tabs to go view the tables in the database, or to submit a new table.
+ * Can also navigate to settings and search from here.
+ * Attaches TablesListFragment and SubmitTableFragment.
+ * Start SettingsActivity and StormpathLoginActivity (Stormpath Login API).
+ */
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "MainActivity";
 
     public static String KEY_SORT_PREF = "sort_pref";
     public static String KEY_FILTER_PREF = "filter_pref";
-
     private final String TABLE_LOCATIONS = "table_locations";
     private final String SUBMIT_LOCATION = "submit_location";
 
-    private static final String baseUrl = "https://stormpathnotes.herokuapp.com/";
+    private static final String mBaseUrl = "https://stormpathnotes.herokuapp.com/";
 
-    PoolLocationsFragment mPoolLocationsFragment = new PoolLocationsFragment();
-    SubmitLocationFragment mSubmitLocationFragment = new SubmitLocationFragment();
-
+    TablesListFragment mTablesListFragment = new TablesListFragment();
+    SubmitTableFragment mSubmitTableFragment = new SubmitTableFragment();
     OkHttpClient okHttpClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         login();
         makeTabs();
     }
@@ -59,14 +62,14 @@ public class MainActivity extends AppCompatActivity {
 
         Stormpath.getUserProfile(new StormpathCallback<UserProfile>() {
             @Override
-            public void onSuccess(UserProfile userProfile) {
+            public void onSuccess(UserProfile userProfile) { //User is logged in
                 showToast(getString(R.string.logged_in));
             }
 
             @Override
             public void onFailure(StormpathError error) {
                 // Show error message and login view
-                if (error.code() != -1) { //unknown error, happens when open app for first time. Don't show toast for this
+                if (error.code() != -1) { //unknown error, happens when open app for first time
                     showToast(getString(R.string.error_logging_in));
                 }
                 Log.d(TAG, "stormpath login error: " + error.message());
@@ -83,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         if (!Stormpath.isInitialized()) { //don't need to redo these things if just re-opening app
             // Initialize Stormpath if not already
             StormpathConfiguration stormpathConfiguration = new StormpathConfiguration.Builder()
-                    .baseUrl(baseUrl)
+                    .baseUrl(mBaseUrl)
                     .build();
             Stormpath.init(this, stormpathConfiguration);
 
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Makes tabs for PoolLocationsFragment and SubmitLocationFragment.
+     * Makes tabs for TablesListFragment and SubmitTableFragment.
      * Used to make above code clearer. Called from onCreate().
      */
     private void makeTabs() {
@@ -114,11 +117,11 @@ public class MainActivity extends AppCompatActivity {
         // Create a tab listener that is called when the user changes tabs.
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                if (tab.getTag() == TABLE_LOCATIONS) { //start PoolLocationsFragment
-                    ft.replace(R.id.activity_main, mPoolLocationsFragment);
+                if (tab.getTag() == TABLE_LOCATIONS) { //start TablesListFragment
+                    ft.replace(R.id.activity_main, mTablesListFragment);
 
-                } else if (tab.getTag() == SUBMIT_LOCATION) { //start SubmitLocationFragment
-                    ft.replace(R.id.activity_main, mSubmitLocationFragment);
+                } else if (tab.getTag() == SUBMIT_LOCATION) { //start SubmitTableFragment
+                    ft.replace(R.id.activity_main, mSubmitTableFragment);
                 }
                 //any other option is an error, do nothing
             }
@@ -141,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Used to display toasts. Makes code cleaner.
+     *
      * @param text String to display in toast
      */
     private void showToast(String text) {
@@ -153,20 +157,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        inflater.inflate(R.menu.options_menu, menu); //adds options_menu layout to options menu
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        //determine which button is clicked based on Id
+        switch (item.getItemId()) { //search for pool tables
             case R.id.search:
                 return true;
-            case R.id.settings:
+            case R.id.settings: //start the SettingsActivity
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.review_app:
+            case R.id.review_app: //review app in Play Store
                 return true;
         }
         return super.onOptionsItemSelected(item);

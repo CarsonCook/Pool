@@ -5,5 +5,5 @@
     android:id="@+id/activity_one_pool_location"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="marcook_pool.pool_finder.activites.OnePoolLocationActivity">
+    tools:context="marcook_pool.pool_finder.activites.TableInformationActivity">
 </RelativeLayout>

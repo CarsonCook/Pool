@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -20,43 +19,62 @@ import java.util.ArrayList;
 import java.util.List;
 
 import marcook_pool.pool_finder.R;
-import marcook_pool.pool_finder.ui.PoolTable;
-import marcook_pool.pool_finder.ui.RecyclerViewAdapter;
-import marcook_pool.pool_finder.ui.SimpleDividerItemDecoration;
+import marcook_pool.pool_finder.util.PoolTable;
+import marcook_pool.pool_finder.util.RecyclerViewAdapter;
+import marcook_pool.pool_finder.util.SimpleDividerItemDecoration;
 
 /**
  * Created by Carson on 17/09/2016.
+ * Used to show all of the pool tables in the Verified Tables table in Firebase Cloud Database.
+ * Shows tables in a Recycler View.
+ * Attached to MainActivity.
  */
+public class TablesListFragment extends Fragment {
 
-public class PoolLocationsFragment extends Fragment {
+    private final String TAG = "TablesListFragment";
+    private final String VERIFIED_POOL_TABLES = "Verified Tables";
 
-    private final String TAG = "PoolLocationsFragment";
-
-    private DatabaseReference mDatabase;
-
-    public RecyclerView mRecyclerView;
-    private LinearLayoutManager mLayoutManager;
+    public RecyclerView mRecyclerView; //public to allow adapter to use the Recycler View
     private RecyclerViewAdapter mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_pool_locations, container, false);
+        setRecyclerView(v);
+        accessDatabase();
+        return v;
+    }
 
+    /**
+     * Sets the recycler view used to show the pool tables. Used for code cleanup, called from onCreateView().
+     *
+     * @param v View of the fragment, used to find the recycler view XML layout
+     */
+    private void setRecyclerView(View v) {
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+        //makes separation of items in recycler view look good
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        //get linear layout manager so that management of recycler view is similar to a list view
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(lm);
+    }
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("Verified Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+    /**
+     * Gets verified pool tables from Firebase Cloud Database.
+     * Gets data when fragment first created, then whenever in fragment and data in the Verified Tables changes.
+     * Used for code cleanup, called from onCreateView().
+     */
+    private void accessDatabase() {
+        FirebaseDatabase.getInstance().getReference()
+                .child(VERIFIED_POOL_TABLES).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<PoolTable> list = new ArrayList<PoolTable>();
+                List<PoolTable> list = new ArrayList<>();
+                //loops through children of dataSnapShop, snapshot IS each child
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    PoolTable curTable = snapshot.getValue(PoolTable.class);
+                    PoolTable curTable = snapshot.getValue(PoolTable.class); //gets each table from each snapshot
                     if (curTable == null) {
-                        // User is null, error out
                         Log.e(TAG, "Pool table is unexpectedly null");
                     } else {
                         list.add(curTable);
@@ -71,6 +89,5 @@ public class PoolLocationsFragment extends Fragment {
                 Log.d(TAG, "PoolTableLocations: ", databaseError.toException());
             }
         });
-        return v;
     }
 }

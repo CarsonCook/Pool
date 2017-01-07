@@ -52,6 +52,8 @@
     <string name="distance">Closest to me</string>
     <string name="sort_results">Sort tables by:</string>
     <string name="none">None</string>
+    <string name="cancel">Cancel</string>
+    <string name="settings">Settings</string>
 
     <!-- database-->
     <string name="submitted_table">Submitted Pool Table</string>
@@ -65,4 +67,11 @@
     <!-- poor data for submit-->
     <string name="no_descrip">Please provide a description</string>
     <string name="no_rating">You gave a rating of 0 stars. Are you sure you want this?</string>
+
+    <!--location messages-->
+    <string name="gps_off">GPS is off</string>
+    <string name="go_to_settings">GPS is not enabled. Do you want to go to turn it on?</string>
+
+    <!--misc-->
+    <string name="ellipses">&#8230;</string> <!-- ellipses-->
 </resources>

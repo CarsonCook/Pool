@@ -1,4 +1,4 @@
-package marcook_pool.pool_finder.ui;
+package marcook_pool.pool_finder.util;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,8 +20,8 @@ import marcook_pool.pool_finder.R;
 
 /**
  * Created by Carson on 17/09/2016.
+ * Used to help implement tabs in MainActivity.
  */
-
 public class FragmentPagerSupport extends FragmentActivity {
     private static final int NUM_ITEMS = 2;
 
@@ -38,6 +38,7 @@ public class FragmentPagerSupport extends FragmentActivity {
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
 
+        //set buttons to be the tabs and create the functionality of different pages
         Button locationTab = (Button) findViewById(R.id.table_location);
         locationTab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
