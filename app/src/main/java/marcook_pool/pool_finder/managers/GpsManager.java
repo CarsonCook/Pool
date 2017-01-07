@@ -9,11 +9,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 /**
  * Created by Carson on 28/11/2016.
@@ -23,11 +25,8 @@ public class GpsManager extends Service implements LocationListener {
 
     private final String TAG = "GpsManager";
 
-    // The minimum distance to change Updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
-
-    // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60; // 1 minute
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; //The minimum distance to change Updates in meters: 10 meters
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60; //The minimum time between updates in milliseconds: 1 minute
 
     //flags for able to get gps
     private boolean mIsGpsEnabled = false;
@@ -38,7 +37,7 @@ public class GpsManager extends Service implements LocationListener {
     private double mLongitude;
 
     private Context mContext;
-    private android.location.LocationManager mLocationManager;
+    private LocationManager mLocationManager;
 
     public GpsManager(Context context) {
         mContext = context;
@@ -121,11 +120,11 @@ public class GpsManager extends Service implements LocationListener {
     }
 
     private String getLatitude() {
-        return Location.convert(mLatitude, 1);
+        return Location.convert(mLatitude, Location.FORMAT_DEGREES);
     }
 
     private String getLongitude() {
-        return Location.convert(mLongitude, 1);
+        return Location.convert(mLongitude, Location.FORMAT_DEGREES);
     }
 
     public boolean canGetLocation() {
@@ -137,14 +136,23 @@ public class GpsManager extends Service implements LocationListener {
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public float getDistance(float latA, float longA, float latB, float longB){
-        Location locationA = new Location("point A");
-        locationA.setLatitude(latA);
-        locationA.setLongitude(longA);
-        Location locationB = new Location("point B");
-        locationB.setLatitude(latB);
-        locationB.setLongitude(longB);
-        return locationA.distanceTo(locationB);
+    /**
+     * Gets distance between two sets of latitude and longitude: the user's and a pool table's.
+     *
+     * @param userLat   The user's latitude.
+     * @param userLong  The user's longitude.
+     * @param tableLat  A table's latitude.
+     * @param tableLong A table's longitude.
+     * @return float holding distance bewteen the two points in km
+     */
+    public float getDistanceBetweenLatLongPair(double userLat, double userLong, double tableLat, double tableLong) {
+        Location userPosition = new Location("user_position");
+        userPosition.setLatitude(userLat);
+        userPosition.setLongitude(userLong);
+        Location tablePosition = new Location("table_position");
+        tablePosition.setLatitude(tableLat);
+        tablePosition.setLongitude(tableLong);
+        return userPosition.distanceTo(tablePosition) / 1000; //1000 converts from m to km
     }
 
     @Nullable

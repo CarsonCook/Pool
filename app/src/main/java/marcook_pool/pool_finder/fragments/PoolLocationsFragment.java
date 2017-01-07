@@ -29,7 +29,7 @@ import marcook_pool.pool_finder.ui.SimpleDividerItemDecoration;
  */
 
 public class PoolLocationsFragment extends Fragment {
-    //TODO: use sharedprefs to get how to sort tables
+
     private final String TAG = "PoolLocationsFragment";
 
     private DatabaseReference mDatabase;

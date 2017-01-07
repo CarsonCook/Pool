@@ -21,7 +21,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     Button mSignOut;
 
-    //TODO: make shadow for button style
     Button mFilterButton;
     Button mSortButton;
     Button mManagePrivatesButton;
@@ -69,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         mManagePrivatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: deal with private management
+
             }
         });
     }

@@ -63,7 +63,6 @@ public class ReviewExistingTableFragment extends Fragment {
                 if (mDescription.getText().length() <= 0) {
                     Toast.makeText(getContext(), getString(R.string.no_descrip), Toast.LENGTH_SHORT).show();
                 } else {
-                    //TODO: upload to firebase database
                     getActivity().finish();
                 }
             }
@@ -72,7 +71,7 @@ public class ReviewExistingTableFragment extends Fragment {
         mPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: open camera, take photo
+
             }
         });
     }

@@ -27,10 +27,11 @@ import marcook_pool.pool_finder.ui.PoolTable;
 
 public class SubmitLocationFragment extends Fragment {
 
+    private int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 1;
+
     private DatabaseReference mDatabase;
     private GpsManager mGpsManager;
-    private String mCoordinates; //"latitude"+' '+"longitude"
-    private int MY_PERMISSIONS_REQUEST_FINE_LOCATION;
+    private String mCoordinates; //"latitude"+' '+"longitude", or NULL
 
     private Button mSubmitButton;
     private Button mLocationButton;
@@ -69,14 +70,12 @@ public class SubmitLocationFragment extends Fragment {
         mLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("submittable", "canGetLocation: " + mGpsManager.canGetLocation() + " permish: " + mGpsManager.haveGpsPermission());
                 if (!mGpsManager.haveGpsPermission()) { //request locaiton permissions
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             MY_PERMISSIONS_REQUEST_FINE_LOCATION);
                 } else if (!mGpsManager.canGetLocation()) { //have permission but location service not on
                     mGpsManager.promptTurnOnGps();
-                    //TODO when location turned on mid session it doesnt register
                 } else if (mGpsManager.canGetLocation() && mGpsManager.haveGpsPermission()) { //have permission, gps on, good to go
                     mCoordinates = mGpsManager.getCoordinates();
                     Toast.makeText(getActivity(), getString(R.string.location_recorded),
@@ -98,13 +97,15 @@ public class SubmitLocationFragment extends Fragment {
                 curTable.establishment = mEstablishment.getText().toString();
                 curTable.rating = mRating.getRating();
                 curTable.photoURL = "";
-                curTable.location = mCoordinates;
-
+                curTable.location = mCoordinates; //used in case mGpsManager is never instantiated,
+                                                    // check for null when used later
                 mDatabase.child("Unverified Tables").child(curTable.establishment).setValue(curTable);
                 Toast.makeText(getContext(), getString(R.string.submitted_table), Toast.LENGTH_SHORT).show();
                 mDescription.setText("");
                 mEstablishment.setText("");
                 mRating.setRating(0);
+
+                mGpsManager.stopUsingGPS();
             }
         });
     }

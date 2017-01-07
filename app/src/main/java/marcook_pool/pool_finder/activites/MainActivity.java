@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TABLE_LOCATIONS = "table_locations";
     private final String SUBMIT_LOCATION = "submit_location";
 
-    public static final String baseUrl = "https://stormpathnotes.herokuapp.com/";
+    private static final String baseUrl = "https://stormpathnotes.herokuapp.com/";
 
     PoolLocationsFragment mPoolLocationsFragment = new PoolLocationsFragment();
     SubmitLocationFragment mSubmitLocationFragment = new SubmitLocationFragment();
@@ -75,6 +75,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Logs user into app. Uses Stormpath Login API.
+     * Used only to make above code clearer. Called in onCreate()
+     */
     private void login() {
         if (!Stormpath.isInitialized()) { //don't need to redo these things if just re-opening app
             // Initialize Stormpath if not already
@@ -93,26 +97,27 @@ public class MainActivity extends AppCompatActivity {
 
             httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             this.okHttpClient = new OkHttpClient.Builder()
-                    .addNetworkInterceptor(httpLoggingInterceptor)
-                    .build();
-            startActivity(new Intent(this, StormpathLoginActivity.class));
+                    .addNetworkInterceptor(httpLoggingInterceptor).build();
+            startActivity(new Intent(this, StormpathLoginActivity.class)); //**only when Stormpath not init??
         }
-        //startActivity(new Intent(this, StormpathLoginActivity.class));
     }
 
+    /**
+     * Makes tabs for PoolLocationsFragment and SubmitLocationFragment.
+     * Used to make above code clearer. Called from onCreate().
+     */
     private void makeTabs() {
-        //TODO: implement swipe views
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar(); //the top bar on the app, holds name, tabs etc.
         // Specify that tabs should be displayed in the action bar.
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Create a tab listener that is called when the user changes tabs.
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                if (tab.getTag() == TABLE_LOCATIONS) {
+                if (tab.getTag() == TABLE_LOCATIONS) { //start PoolLocationsFragment
                     ft.replace(R.id.activity_main, mPoolLocationsFragment);
 
-                } else if (tab.getTag() == SUBMIT_LOCATION) {
+                } else if (tab.getTag() == SUBMIT_LOCATION) { //start SubmitLocationFragment
                     ft.replace(R.id.activity_main, mSubmitLocationFragment);
                 }
                 //any other option is an error, do nothing
@@ -127,17 +132,21 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        //adds tabs to the action bar
         actionBar.addTab(actionBar.newTab().setText(getString(R.string.table_locations_tab))
                 .setTag(TABLE_LOCATIONS).setTabListener(tabListener));
         actionBar.addTab(actionBar.newTab().setText(getString(R.string.submit_tables_tab))
                 .setTag(SUBMIT_LOCATION).setTabListener(tabListener));
     }
 
+    /**
+     * Used to display toasts. Makes code cleaner.
+     * @param text String to display in toast
+     */
     private void showToast(String text) {
-        Spannable centeredText = new SpannableString(text);
+        Spannable centeredText = new SpannableString(text); //need Spannable to make centred text
         centeredText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
-                0, text.length() - 1,
-                Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                0, text.length() - 1, Spannable.SPAN_INCLUSIVE_INCLUSIVE); //actually centre text
         Toast.makeText(this, centeredText, Toast.LENGTH_SHORT).show();
     }
 
@@ -152,14 +161,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
-                //TODO: search for pool table locations
                 return true;
             case R.id.settings:
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.review_app:
-                //TODO: send to play store or some review process
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -168,6 +175,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Stormpath.logout();
+        Stormpath.logout();//logs user out when app closed
     }
 }

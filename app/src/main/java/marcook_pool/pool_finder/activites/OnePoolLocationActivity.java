@@ -10,8 +10,6 @@ import marcook_pool.pool_finder.R;
 import marcook_pool.pool_finder.fragments.PoolTableReviewFragment;
 import marcook_pool.pool_finder.ui.RecyclerViewHolder;
 
-//TODO: back button
-
 public class OnePoolLocationActivity extends AppCompatActivity {
 
     PoolTableReviewFragment mPoolTableReviewFragment = new PoolTableReviewFragment();
