@@ -50,14 +50,12 @@ public class TableLocationManager extends Service implements LocationListener {
     //haveLocationPermission() checks for permission but IDE doesn't realize that and gives warning
     private void getLocation() {
         try {
-            if (canGetLocation()) {
-                if (mIsLocationEnabled && haveLocationPermission()) {
-                    mLocationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER,
-                            MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    Location location = mLocationManager.getLastKnownLocation(android.location.LocationManager.NETWORK_PROVIDER);
-                    mLatitude = location.getLatitude();
-                    mLongitude = location.getLongitude();
-                }
+            if (canGetLocation() && haveLocationPermission()) {
+                mLocationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER,
+                        MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                Location location = mLocationManager.getLastKnownLocation(android.location.LocationManager.NETWORK_PROVIDER);
+                mLatitude = location.getLatitude();
+                mLongitude = location.getLongitude();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -181,10 +179,12 @@ public class TableLocationManager extends Service implements LocationListener {
     }
 
     @Override
-    public void onLocationChanged(Location location) {}
+    public void onLocationChanged(Location location) {
+    }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {}
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+    }
 
     @Override
     public void onProviderEnabled(String s) {
@@ -192,5 +192,6 @@ public class TableLocationManager extends Service implements LocationListener {
     }
 
     @Override
-    public void onProviderDisabled(String s) {}
+    public void onProviderDisabled(String s) {
+    }
 }
