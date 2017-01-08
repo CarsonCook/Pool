@@ -127,13 +127,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.addTab(actionBar.newTab().setText(getString(R.string.submit_tables_tab))
                 .setTag(SUBMIT_LOCATION).setTabListener(tabListener));
 
-        //set listener for page change, implements swipe views
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
+        setupSwipeTab(actionBar);
     }
 
     /**
@@ -145,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionBar.TabListener createTabListener() {
         // Create a tab listener that is called when the user changes tabs.
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) { //for tab click NOT swipe
                 if (tab.getTag() == TABLE_LOCATIONS) { //start TablesListFragment
                     mViewPager.setCurrentItem(tab.getPosition());
                     // ft.replace(R.id.activity_main, mTablesListFragment);
@@ -156,14 +150,27 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-                //ignore this event
             }
 
             public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-                //ignore this event
             }
         };
         return tabListener;
+    }
+
+    /**
+     * Sets the listener for the tabs that allows swiping between them.
+     *
+     * @param actionBar Actionbar where the tabs are, need to change tabs.
+     */
+    private void setupSwipeTab(final ActionBar actionBar) {
+        //set listener for page change, implements swipe views NOT tab clicks
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                actionBar.setSelectedNavigationItem(position);
+            }
+        });
     }
 
     /**
