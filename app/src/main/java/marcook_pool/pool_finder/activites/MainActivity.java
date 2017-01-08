@@ -23,9 +23,7 @@ import com.stormpath.sdk.models.StormpathError;
 import com.stormpath.sdk.models.UserProfile;
 import com.stormpath.sdk.ui.StormpathLoginActivity;
 
-import marcook_pool.pool_finder.fragments.TablesListFragment;
 import marcook_pool.pool_finder.R;
-import marcook_pool.pool_finder.fragments.SubmitTableFragment;
 import marcook_pool.pool_finder.util.SwipePagerAdapter;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -57,9 +55,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SwipePagerAdapter swipePagerAdapter = new SwipePagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(swipePagerAdapter);
         login();
         makeTabs();
     }
@@ -118,10 +113,36 @@ public class MainActivity extends AppCompatActivity {
      * Used to make above code clearer. Called from onCreate().
      */
     private void makeTabs() {
+        SwipePagerAdapter swipePagerAdapter = new SwipePagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(swipePagerAdapter);
         final ActionBar actionBar = getSupportActionBar(); //the top bar on the app, holds name, tabs etc.
+
         // Specify that tabs should be displayed in the action bar.
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ActionBar.TabListener tabListener = createTabListener();
+        //adds tabs to the action bar
+        actionBar.addTab(actionBar.newTab().setText(getString(R.string.table_locations_tab))
+                .setTag(TABLE_LOCATIONS).setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setText(getString(R.string.submit_tables_tab))
+                .setTag(SUBMIT_LOCATION).setTabListener(tabListener));
 
+        //set listener for page change, implements swipe views
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                actionBar.setSelectedNavigationItem(position);
+            }
+        });
+    }
+
+    /**
+     * Create a tab listener for the action bar that handles events like on Tab Selected.
+     * Used for code cleanup, called from makeTabs().
+     *
+     * @return TabListener object that holds the event callbacks.
+     */
+    private ActionBar.TabListener createTabListener() {
         // Create a tab listener that is called when the user changes tabs.
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
@@ -142,19 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 //ignore this event
             }
         };
-
-        //adds tabs to the action bar
-        actionBar.addTab(actionBar.newTab().setText(getString(R.string.table_locations_tab))
-                .setTag(TABLE_LOCATIONS).setTabListener(tabListener));
-        actionBar.addTab(actionBar.newTab().setText(getString(R.string.submit_tables_tab))
-                .setTag(SUBMIT_LOCATION).setTabListener(tabListener));
-
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
+        return tabListener;
     }
 
     /**

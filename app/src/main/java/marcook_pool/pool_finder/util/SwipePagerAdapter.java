@@ -20,6 +20,7 @@ public class SwipePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        //returns fragment to go to on tab click/swipe
         Fragment fragment = null;
         switch (position) {
             case MainActivity.TABLES_LIST_POS:
