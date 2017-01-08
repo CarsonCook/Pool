@@ -1,6 +1,7 @@
 package marcook_pool.pool_finder.activites;
 
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.stormpath.sdk.ui.StormpathLoginActivity;
 import marcook_pool.pool_finder.fragments.TablesListFragment;
 import marcook_pool.pool_finder.R;
 import marcook_pool.pool_finder.fragments.SubmitTableFragment;
+import marcook_pool.pool_finder.util.SwipePagerAdapter;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -41,17 +43,22 @@ public class MainActivity extends AppCompatActivity {
     public static String KEY_FILTER_PREF = "filter_pref";
     private final String TABLE_LOCATIONS = "table_locations";
     private final String SUBMIT_LOCATION = "submit_location";
+    public static final int TABLES_LIST_POS = 0; //1st tab so position 0
+    public static final int SUBMIT_TABLE_POS = 1; //second tab
 
-    private static final String mBaseUrl = "https://stormpathnotes.herokuapp.com/";
+    private ViewPager mViewPager;
 
-    TablesListFragment mTablesListFragment = new TablesListFragment();
-    SubmitTableFragment mSubmitTableFragment = new SubmitTableFragment();
-    OkHttpClient okHttpClient;
+    //for Stormpath Login API, private doesn't work
+    public OkHttpClient mOkHttpClient;
+    public static final String mBaseUrl = "https://stormpathnotes.herokuapp.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SwipePagerAdapter swipePagerAdapter = new SwipePagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(swipePagerAdapter);
         login();
         makeTabs();
     }
@@ -99,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            this.okHttpClient = new OkHttpClient.Builder()
+            this.mOkHttpClient = new OkHttpClient.Builder()
                     .addNetworkInterceptor(httpLoggingInterceptor).build();
             startActivity(new Intent(this, StormpathLoginActivity.class)); //**only when Stormpath not init??
         }
@@ -110,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
      * Used to make above code clearer. Called from onCreate().
      */
     private void makeTabs() {
-        ActionBar actionBar = getSupportActionBar(); //the top bar on the app, holds name, tabs etc.
+        final ActionBar actionBar = getSupportActionBar(); //the top bar on the app, holds name, tabs etc.
         // Specify that tabs should be displayed in the action bar.
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -118,12 +125,12 @@ public class MainActivity extends AppCompatActivity {
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                 if (tab.getTag() == TABLE_LOCATIONS) { //start TablesListFragment
-                    ft.replace(R.id.activity_main, mTablesListFragment);
+                    mViewPager.setCurrentItem(tab.getPosition());
+                    // ft.replace(R.id.activity_main, mTablesListFragment);
 
                 } else if (tab.getTag() == SUBMIT_LOCATION) { //start SubmitTableFragment
-                    ft.replace(R.id.activity_main, mSubmitTableFragment);
+                    mViewPager.setCurrentItem(tab.getPosition());
                 }
-                //any other option is an error, do nothing
             }
 
             public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
@@ -140,6 +147,13 @@ public class MainActivity extends AppCompatActivity {
                 .setTag(TABLE_LOCATIONS).setTabListener(tabListener));
         actionBar.addTab(actionBar.newTab().setText(getString(R.string.submit_tables_tab))
                 .setTag(SUBMIT_LOCATION).setTabListener(tabListener));
+
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                actionBar.setSelectedNavigationItem(position);
+            }
+        });
     }
 
     /**
