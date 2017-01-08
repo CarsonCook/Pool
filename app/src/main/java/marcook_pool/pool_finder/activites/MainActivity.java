@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private final String SUBMIT_LOCATION = "submit_location";
     public static final int TABLES_LIST_POS = 0; //1st tab so position 0
     public static final int SUBMIT_TABLE_POS = 1; //second tab
+    public static final int NUM_TABS = 2; //number of tabs used
 
     private ViewPager mViewPager;
 

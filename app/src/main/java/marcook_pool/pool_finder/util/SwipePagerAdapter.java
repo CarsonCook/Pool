@@ -34,6 +34,6 @@ public class SwipePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2; //two tabs
+        return MainActivity.NUM_TABS; //two tabs
     }
 }
