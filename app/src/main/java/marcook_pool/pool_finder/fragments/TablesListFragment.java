@@ -1,7 +1,9 @@
 package marcook_pool.pool_finder.fragments;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,6 +25,7 @@ import marcook_pool.pool_finder.R;
 import marcook_pool.pool_finder.util.PoolTable;
 import marcook_pool.pool_finder.util.RecyclerViewAdapter;
 import marcook_pool.pool_finder.util.SimpleDividerItemDecoration;
+import marcook_pool.pool_finder.util.managers.TableLocationManager;
 
 /**
  * Created by Carson on 17/09/2016.
@@ -36,11 +40,13 @@ public class TablesListFragment extends Fragment {
 
     public RecyclerView mRecyclerView; //public to allow adapter to use the Recycler View
     private RecyclerViewAdapter mAdapter;
+    private TableLocationManager mTableLocationManager;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_pool_locations, container, false);
+        mTableLocationManager = new TableLocationManager(getContext());
         setRecyclerView(v);
         accessDatabase();
         return v;
@@ -78,7 +84,9 @@ public class TablesListFragment extends Fragment {
                         Log.e(TAG, "Pool table is unexpectedly null");
                     } else {
                         list.add(curTable);
-                        mAdapter = new RecyclerViewAdapter(list, getContext());
+                        getUserLocation();
+                        mAdapter = new RecyclerViewAdapter(list, getContext(),
+                                mTableLocationManager.getLatitude(),mTableLocationManager.getLongitude());
                         mRecyclerView.setAdapter(mAdapter);
                     }
                 }
@@ -89,5 +97,20 @@ public class TablesListFragment extends Fragment {
                 Log.d(TAG, "PoolTableLocations: ", databaseError.toException());
             }
         });
+    }
+
+    private void getUserLocation() {
+        if (!mTableLocationManager.haveLocationPermission()) { //request location permissions if do not have it
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    SubmitTableFragment.MY_PERMISSIONS_REQUEST_FINE_LOCATION);
+        } else if (!mTableLocationManager.canGetLocation()) { //have permission but location service not on
+            mTableLocationManager.promptTurnOnGps();
+        } else if (mTableLocationManager.canGetLocation() && mTableLocationManager.haveLocationPermission()) {//can get location
+            //record coordinates and have UI confirmation
+            mTableLocationManager.getLocation();
+            Toast.makeText(getActivity(), getString(R.string.location_recorded),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }

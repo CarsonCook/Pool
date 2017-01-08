@@ -28,13 +28,11 @@ import marcook_pool.pool_finder.util.PoolTable;
  */
 public class SubmitTableFragment extends Fragment {
 
-    private final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 1;
+    public static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 1;
     private final String UNVERIFIED_TABLES = "Unverified Tables";
 
     private DatabaseReference mDatabase;
     private TableLocationManager mTableLocationManager;
-    private String mCoordinates; //"latitude"+' '+"longitude", or NULL
-    //used instead of getLat/Long so you can check if no location was added (NULL)
     private Button mSubmitButton;
     private Button mLocationButton;
     private Button mPhotoButton;
@@ -61,7 +59,7 @@ public class SubmitTableFragment extends Fragment {
      */
     private void setViews(View v) {
         mSubmitButton = (Button) v.findViewById(R.id.submit);
-        mLocationButton = (Button) v.findViewById(R.id.location);
+        mLocationButton = (Button) v.findViewById(R.id.add_location);
         mPhotoButton = (Button) v.findViewById(R.id.add_photo_button);
         mEstablishment = (EditText) v.findViewById(R.id.establishment);
         mDescription = (EditText) v.findViewById(R.id.description);
@@ -114,7 +112,7 @@ public class SubmitTableFragment extends Fragment {
             mTableLocationManager.promptTurnOnGps();
         } else if (mTableLocationManager.canGetLocation() && mTableLocationManager.haveLocationPermission()) {//can get location
             //record coordinates and have UI confirmation
-            mCoordinates = mTableLocationManager.getCoordinates();
+            mTableLocationManager.getLocation();
             Toast.makeText(getActivity(), getString(R.string.location_recorded),
                     Toast.LENGTH_SHORT).show();
         }
@@ -132,7 +130,8 @@ public class SubmitTableFragment extends Fragment {
         table.establishment = mEstablishment.getText().toString();
         table.rating = mRating.getRating();
         table.photoURL = "";
-        table.location = mCoordinates;
+        table.latitude = mTableLocationManager.getLatitude();
+        table.longitude = mTableLocationManager.getLongitude();
     }
 
     /**

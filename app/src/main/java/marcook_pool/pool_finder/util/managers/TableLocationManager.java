@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import marcook_pool.pool_finder.R;
 
@@ -25,13 +26,17 @@ import marcook_pool.pool_finder.R;
 public class TableLocationManager extends Service implements LocationListener {
     private final String TAG = "TableLocationManager";
 
+    public static final double FLAG_NO_LAT = 0;
+    public static final double FLAG_NO_LONG = 0;
+
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; //The minimum distance to change Updates in meters: 10 meters
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60; //The minimum time between updates in milliseconds: 1 minute
 
 
     private boolean mIsLocationEnabled = false; //uses network to get location
-    private double mLatitude;
-    private double mLongitude;
+    //initialize as 0 for flag that location was not added
+    private double mLatitude = FLAG_NO_LAT;
+    private double mLongitude = FLAG_NO_LONG;
 
     private Context mContext;
     private LocationManager mLocationManager;
@@ -43,12 +48,12 @@ public class TableLocationManager extends Service implements LocationListener {
     }
 
     /**
-     * Used to get user location from gps or network!!
-     * Used as code cleanup, called from getCoordinates().
+     * Used to get user location from cell network
+     * Public so that location can be aquired from anywhere in app
      */
     @SuppressWarnings("all")
     //haveLocationPermission() checks for permission but IDE doesn't realize that and gives warning
-    private void getLocation() {
+    public void getLocation() {
         try {
             if (canGetLocation() && haveLocationPermission()) {
                 mLocationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER,
@@ -56,6 +61,7 @@ public class TableLocationManager extends Service implements LocationListener {
                 Location location = mLocationManager.getLastKnownLocation(android.location.LocationManager.NETWORK_PROVIDER);
                 mLatitude = location.getLatitude();
                 mLongitude = location.getLongitude();
+                Log.d("locationmanager", "test: " + mLatitude);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,31 +106,21 @@ public class TableLocationManager extends Service implements LocationListener {
     }
 
     /**
-     * Accessor to get lat/long in app.
-     *
-     * @return Returns string of format Lat:value Long:value.
-     */
-    public String getCoordinates() {
-        getLocation(); //sets mLat/mLong
-        return "Lat:" + getLatitude() + " Long:" + getLongitude(); //returns good with good formatting
-    }
-
-    /**
-     * Gets saved latitude in mLatitude in a string formatted to degrees.
+     * Gets saved latitude in mLatitude in degrees.
      *
      * @return String holding latitude in degrees.
      */
-    private String getLatitude() {
-        return Location.convert(mLatitude, Location.FORMAT_DEGREES);
+    public double getLatitude() {
+        return mLatitude; //in degrees
     }
 
     /**
-     * Gets saved longitude in mLongitude in a string formatted to degrees.
+     * Gets saved longitude in mLongitude in degrees.
      *
      * @return String holding longitude in degrees.
      */
-    private String getLongitude() {
-        return Location.convert(mLongitude, Location.FORMAT_DEGREES);
+    public double getLongitude() {
+        return mLongitude; //in degrees
     }
 
     /**
@@ -153,13 +149,13 @@ public class TableLocationManager extends Service implements LocationListener {
      * Public so that the distance can be acquired at will throughout app.
      * No need to dummy proof for permission etc. as lats/longs are parameters, not class variables.
      *
-     * @param userLat   The user's latitude.
-     * @param userLong  The user's longitude.
-     * @param tableLat  A table's latitude.
-     * @param tableLong A table's longitude.
+     * @param userLat   The user's latitude in degrees.
+     * @param userLong  The user's longitude in degrees.
+     * @param tableLat  A table's latitude in degrees.
+     * @param tableLong A table's longitude in degrees.
      * @return float holding distance between the two points in km
      */
-    public float getDistanceBetweenLatLongPair(double userLat, double userLong, double tableLat, double tableLong) {
+    public static float getDistanceBetweenLatLongPair(double userLat, double userLong, double tableLat, double tableLong) {
         Location userPosition = new Location("user_position");
         userPosition.setLatitude(userLat);
         userPosition.setLongitude(userLong);
@@ -167,7 +163,8 @@ public class TableLocationManager extends Service implements LocationListener {
         Location tablePosition = new Location("table_position");
         tablePosition.setLatitude(tableLat);
         tablePosition.setLongitude(tableLong);
-
+        Log.d("LocationManager", "userLat: " + userLat + " userLong: " + userLong + " tableLat: " + tableLat + " tableLong: " + tableLong);
+        Log.d("LocationManager", "dis: " + userPosition.distanceTo(tablePosition));
         return userPosition.distanceTo(tablePosition) / 1000; //1000 converts from m to km
     }
 

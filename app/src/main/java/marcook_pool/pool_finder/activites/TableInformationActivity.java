@@ -24,7 +24,7 @@ public class TableInformationActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putString(RecyclerViewHolder.KEY_ESTABLISHMENT, intent.getStringExtra(RecyclerViewHolder.KEY_ESTABLISHMENT));
         bundle.putString(RecyclerViewHolder.KEY_DESCRIPTION, intent.getStringExtra(RecyclerViewHolder.KEY_DESCRIPTION));
-        bundle.putString(RecyclerViewHolder.KEY_LOCATION, intent.getStringExtra(RecyclerViewHolder.KEY_LOCATION));
+        bundle.putString(RecyclerViewHolder.KEY_DISTANCE, intent.getStringExtra(RecyclerViewHolder.KEY_DISTANCE));
         bundle.putFloat(RecyclerViewHolder.KEY_RATING_BAR, intent.getFloatExtra(RecyclerViewHolder.KEY_RATING_BAR, 0));
         mTableInfoFragment.setArguments(bundle);
         //start fragment

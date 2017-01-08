@@ -25,7 +25,7 @@ public class TableInfoFragment extends Fragment {
 
     private TextView mEstablishment;
     private TextView mDescription;
-    private TextView mLocation;
+    private TextView mDistance;
     private RatingBar mRatingBar;
     private Button mLeaveReview;
 
@@ -49,7 +49,7 @@ public class TableInfoFragment extends Fragment {
     private void setViews(View v) {
         mEstablishment = (TextView) v.findViewById(R.id.establishment);
         mDescription = (TextView) v.findViewById(R.id.description);
-        mLocation = (TextView) v.findViewById(R.id.location);
+        mDistance = (TextView) v.findViewById(R.id.distance);
         mRatingBar = (RatingBar) v.findViewById(R.id.rating_bar);
         mLeaveReview = (Button) v.findViewById(R.id.leave_review);
     }
@@ -63,7 +63,7 @@ public class TableInfoFragment extends Fragment {
         Bundle bundle = getArguments();
         mEstablishment.setText(bundle.getString(RecyclerViewHolder.KEY_ESTABLISHMENT));
         mDescription.setText(bundle.getString(RecyclerViewHolder.KEY_DESCRIPTION));
-        mLocation.setText(bundle.getString(RecyclerViewHolder.KEY_LOCATION));
+        mDistance.setText(bundle.getString(RecyclerViewHolder.KEY_DISTANCE));
         mRatingBar.setRating(bundle.getFloat(RecyclerViewHolder.KEY_RATING_BAR, 0));
         mLeaveReview.setOnClickListener(new View.OnClickListener() {
             @Override

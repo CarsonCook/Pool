@@ -2,6 +2,7 @@ package marcook_pool.pool_finder.util;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import marcook_pool.pool_finder.R;
+import marcook_pool.pool_finder.util.managers.TableLocationManager;
 
 /**
  * Created by Carson on 18/09/2016.
@@ -17,12 +19,16 @@ import marcook_pool.pool_finder.R;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     private final int MAX_DESCRIPTION_LENGTH = 30;
     private Context mContext;
+    private double mLatitude; //users current latitude
+    private double mLongitude; //users current longitude, for calculating distance from table
 
     private List<PoolTable> mPoolTables; //list of each person's data
 
-    public RecyclerViewAdapter(List<PoolTable> poolTable, Context context) {
+    public RecyclerViewAdapter(List<PoolTable> poolTable, Context context, double latitude, double longitude) {
         this.mPoolTables = poolTable;
         this.mContext = context;
+        this.mLatitude = latitude;
+        this.mLongitude = longitude;
     }
 
     @Override
@@ -37,8 +43,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
         //set fields in the card...e.g. location, rating etc.
         holder.mEstablishment.setText(mPoolTables.get(position).getEstablishment());
         setDescription(holder, position);
-        holder.mLocation.setText(mPoolTables.get(position).getLocation());
         holder.mRatingBar.setRating(mPoolTables.get(position).getReview());
+        setDistance(holder, position);
     }
 
     @Override
@@ -66,5 +72,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
             holder.mDescription.setText(shortDescription);
             holder.mLongDescription.setText(description);
         }
+    }
+
+    private void setDistance(RecyclerViewHolder holder, int position) {
+        double tableLat = mPoolTables.get(position).getLatitude();
+        double tableLong = mPoolTables.get(position).getLongitude();
+        if (tableLat == TableLocationManager.FLAG_NO_LAT && tableLong == TableLocationManager.FLAG_NO_LONG){
+            holder.mDistance.setText(mContext.getString(R.string.no_location));
+            return;
+        }
+        double distance = TableLocationManager.getDistanceBetweenLatLongPair(mLatitude, mLongitude, tableLat, tableLong);
+        String displayDistance = String.valueOf(distance) + " km";
+        holder.mDistance.setText(displayDistance);
     }
 }

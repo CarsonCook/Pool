@@ -11,7 +11,8 @@ public class PoolTable {
     public int ID;
     public String photoURL;
     public String establishment;
-    public String location;
+    public double latitude;
+    public double longitude;
     public String description;
     public float rating;
 
@@ -26,8 +27,12 @@ public class PoolTable {
         return description;
     }
 
-    public String getLocation() {
-        return location;
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 
     public float getReview() {

@@ -71,6 +71,7 @@
     <!--location messages-->
     <string name="gps_off">GPS is off</string>
     <string name="go_to_settings">GPS is not enabled. Do you want to go to turn it on?</string>
+    <string name="no_location">N/A</string>
 
     <!--misc-->
     <string name="ellipses">&#8230;</string> <!-- ellipses-->

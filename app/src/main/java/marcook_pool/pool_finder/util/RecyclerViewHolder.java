@@ -17,13 +17,13 @@ import marcook_pool.pool_finder.activites.TableInformationActivity;
 public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     public static final String KEY_ESTABLISHMENT = "KEY_ESTABLISHMENT";
     public static final String KEY_DESCRIPTION = "KEY_DESCRIPTION";
-    public static final String KEY_LOCATION = "KEY_LOCATION";
+    public static final String KEY_DISTANCE = "KEY_DISTANCE";
     public static final String KEY_RATING_BAR = "KEY_RATING_BAR";
 
     TextView mEstablishment;
     TextView mDescription; //description if <30 chars else 27 chars + ...
     TextView mLongDescription; //actual description if it exceeds 30 chars, if not then null
-    TextView mLocation;
+    TextView mDistance;
     RatingBar mRatingBar;
 
     private Context mContext;
@@ -34,7 +34,7 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.
         mEstablishment = (TextView) itemView.findViewById(R.id.establishment);
         mDescription = (TextView) itemView.findViewById(R.id.description);
         mLongDescription = (TextView) itemView.findViewById(R.id.long_description);
-        mLocation = (TextView) itemView.findViewById(R.id.location);
+        mDistance = (TextView) itemView.findViewById(R.id.distance);
         mRatingBar = (RatingBar) itemView.findViewById(R.id.rating_bar);
         mContext = mEstablishment.getContext(); //holder has no context, can't use getContext, but TextView does
     }
@@ -72,7 +72,7 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.
         } else {
             intent.putExtra(KEY_DESCRIPTION, mDescription.getText().toString());
         }
-        intent.putExtra(KEY_LOCATION, mLocation.getText().toString());
+        intent.putExtra(KEY_DISTANCE, mDistance.getText().toString());
         intent.putExtra(KEY_RATING_BAR, mRatingBar.getRating());
         return intent;
     }
