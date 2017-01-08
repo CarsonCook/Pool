@@ -74,10 +74,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
         }
     }
 
+    /**
+     * Used to set distance from user to pool table in a Textview.
+     * Used to cleanup code, called from onBindViewHolder().
+     *
+     * @param holder   RecyclerViewHolder instance that holds the distance Textview.
+     * @param position position in List of the table we are working with
+     */
     private void setDistance(RecyclerViewHolder holder, int position) {
         double tableLat = mPoolTables.get(position).getLatitude();
         double tableLong = mPoolTables.get(position).getLongitude();
-        if (tableLat == TableLocationManager.FLAG_NO_LAT && tableLong == TableLocationManager.FLAG_NO_LONG){
+        if (tableLat == TableLocationManager.FLAG_NO_LAT && tableLong == TableLocationManager.FLAG_NO_LONG) {
             holder.mDistance.setText(mContext.getString(R.string.no_location));
             return;
         }
