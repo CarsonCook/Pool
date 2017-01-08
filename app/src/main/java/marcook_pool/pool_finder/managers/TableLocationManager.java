@@ -23,14 +23,13 @@ import marcook_pool.pool_finder.R;
  * Used to get user location for a table.
  */
 public class TableLocationManager extends Service implements LocationListener {
+    private final String TAG = "TableLocationManager";
+
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; //The minimum distance to change Updates in meters: 10 meters
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60; //The minimum time between updates in milliseconds: 1 minute
 
-    //flags for able to get gps
-    private boolean mIsGpsEnabled = false;
-    private boolean mIsNetworkEnabled = false;
 
-    private Location mLocation;
+    private boolean mIsLocationEnabled = false; //uses network to get location
     private double mLatitude;
     private double mLongitude;
 
@@ -40,47 +39,26 @@ public class TableLocationManager extends Service implements LocationListener {
     public TableLocationManager(Context context) {
         this.mContext = context;
         this.mLocationManager = (android.location.LocationManager) mContext.getSystemService(LOCATION_SERVICE);
-        this.mIsGpsEnabled = mLocationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
-        this.mIsNetworkEnabled = mLocationManager.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER);
+        this.mIsLocationEnabled = mLocationManager.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER);
     }
 
     /**
      * Used to get user location from gps or network!!
      * Used as code cleanup, called from getCoordinates().
      */
+    @SuppressWarnings("all")
+    //haveLocationPermission() checks for permission but IDE doesn't realize that and gives warning
     private void getLocation() {
         try {
             if (canGetLocation()) {
-                // First get location from Network Provider
-                if (mIsNetworkEnabled) {
-                    mLocationManager.requestLocationUpdates
-                            (android.location.LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
-                                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    if (mLocationManager != null) {
-                        mLocation = mLocationManager.getLastKnownLocation(android.location.LocationManager.NETWORK_PROVIDER);
-                        if (mLocation != null) {
-                            mLatitude = mLocation.getLatitude();
-                            mLongitude = mLocation.getLongitude();
-                        }
-                    }
-                }
-                // if GPS Enabled get lat/long using GPS Services
-                if (mIsGpsEnabled) {
-                    if (mLocation == null && ContextCompat.checkSelfPermission(mContext, //checks if GPS Permission had
-                            Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        mLocationManager.requestLocationUpdates(android.location.LocationManager.GPS_PROVIDER,
-                                MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                        if (mLocationManager != null) {
-                            mLocation = mLocationManager.getLastKnownLocation(android.location.LocationManager.GPS_PROVIDER);
-                            if (mLocation != null) {
-                                mLatitude = mLocation.getLatitude();
-                                mLongitude = mLocation.getLongitude();
-                            }
-                        }
-                    }
+                if (mIsLocationEnabled && haveLocationPermission()) {
+                    mLocationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER,
+                            MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Location location = mLocationManager.getLastKnownLocation(android.location.LocationManager.NETWORK_PROVIDER);
+                    mLatitude = location.getLatitude();
+                    mLongitude = location.getLongitude();
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -116,9 +94,9 @@ public class TableLocationManager extends Service implements LocationListener {
      * Public so that anytime location taken in app, it can be stopped. Able to be used everywhere and at will.
      */
     @SuppressWarnings("all")
-    //haveGpsPermission() checks for permission but IDE doesn't realize that and gives warning
+    //haveLocationPermission() checks for permission but IDE doesn't realize that and gives warning
     public void stopUsingGPS() {
-        if (mLocationManager != null && haveGpsPermission()) {
+        if (mLocationManager != null && haveLocationPermission()) {
             mLocationManager.removeUpdates(TableLocationManager.this);
         }
     }
@@ -159,7 +137,7 @@ public class TableLocationManager extends Service implements LocationListener {
      * @return True if can get location (network or GPS), else false
      */
     public boolean canGetLocation() {
-        return mIsNetworkEnabled || mIsGpsEnabled;
+        return mIsLocationEnabled;
     }
 
     /**
@@ -167,7 +145,7 @@ public class TableLocationManager extends Service implements LocationListener {
      *
      * @return True if have permission, false if not.
      */
-    public boolean haveGpsPermission() {
+    public boolean haveLocationPermission() {
         return ContextCompat.checkSelfPermission(mContext,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
@@ -187,9 +165,11 @@ public class TableLocationManager extends Service implements LocationListener {
         Location userPosition = new Location("user_position");
         userPosition.setLatitude(userLat);
         userPosition.setLongitude(userLong);
+
         Location tablePosition = new Location("table_position");
         tablePosition.setLatitude(tableLat);
         tablePosition.setLongitude(tableLong);
+
         return userPosition.distanceTo(tablePosition) / 1000; //1000 converts from m to km
     }
 
@@ -201,14 +181,10 @@ public class TableLocationManager extends Service implements LocationListener {
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-
-    }
+    public void onLocationChanged(Location location) {}
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
+    public void onStatusChanged(String s, int i, Bundle bundle) {}
 
     @Override
     public void onProviderEnabled(String s) {
@@ -216,7 +192,5 @@ public class TableLocationManager extends Service implements LocationListener {
     }
 
     @Override
-    public void onProviderDisabled(String s) {
-
-    }
+    public void onProviderDisabled(String s) {}
 }

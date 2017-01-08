@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,13 +107,13 @@ public class SubmitTableFragment extends Fragment {
      * Used for code cleanup, called when Add Location button is clicked.
      */
     private void getUserLocation() {
-        if (!mTableLocationManager.haveGpsPermission()) { //request location permissions if do not have it
+        if (!mTableLocationManager.haveLocationPermission()) { //request location permissions if do not have it
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_FINE_LOCATION);
         } else if (!mTableLocationManager.canGetLocation()) { //have permission but location service not on
             mTableLocationManager.promptTurnOnGps();
-        } else if (mTableLocationManager.canGetLocation() && mTableLocationManager.haveGpsPermission()) {//can get location
+        } else if (mTableLocationManager.canGetLocation() && mTableLocationManager.haveLocationPermission()) {//can get location
             //record coordinates and have UI confirmation
             mCoordinates = mTableLocationManager.getCoordinates();
             Toast.makeText(getActivity(), getString(R.string.location_recorded),
