@@ -1,4 +1,4 @@
-package marcook_pool.pool_finder.managers;
+package marcook_pool.pool_finder.util.managers;
 
 import android.Manifest;
 import android.app.AlertDialog;
