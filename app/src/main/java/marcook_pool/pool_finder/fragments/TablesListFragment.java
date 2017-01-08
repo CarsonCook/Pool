@@ -99,6 +99,10 @@ public class TablesListFragment extends Fragment {
         });
     }
 
+    /**
+     * Used to get current location to calculate distance to a pool table.
+     * Used for code cleanup, called from onDataChange() in accessDatabase().
+     */
     private void getUserLocation() {
         if (!mTableLocationManager.haveLocationPermission()) { //request location permissions if do not have it
             ActivityCompat.requestPermissions(getActivity(),
