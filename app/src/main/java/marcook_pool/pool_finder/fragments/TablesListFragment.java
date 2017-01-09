@@ -104,17 +104,8 @@ public class TablesListFragment extends Fragment {
      * Used for code cleanup, called from onDataChange() in accessDatabase().
      */
     private void getUserLocation() {
-        if (!mTableLocationManager.haveLocationPermission()) { //request location permissions if do not have it
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    SubmitTableFragment.MY_PERMISSIONS_REQUEST_FINE_LOCATION);
-        } else if (!mTableLocationManager.canGetLocation()) { //have permission but location service not on
-            mTableLocationManager.promptTurnOnGps();
-        } else if (mTableLocationManager.canGetLocation() && mTableLocationManager.haveLocationPermission()) {//can get location
-            //record coordinates and have UI confirmation
-            mTableLocationManager.getLocation();
-            Toast.makeText(getActivity(), getString(R.string.location_recorded),
-                    Toast.LENGTH_SHORT).show();
-        }
+        mTableLocationManager.getLocation();
+        Toast.makeText(getActivity(), getString(R.string.location_recorded),
+                Toast.LENGTH_SHORT).show();
     }
 }

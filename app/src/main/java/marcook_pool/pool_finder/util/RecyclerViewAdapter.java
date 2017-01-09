@@ -44,8 +44,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
         //set fields in the card...e.g. location, rating etc.
         holder.mEstablishment.setText(mPoolTables.get(position).getEstablishment());
-        setDescription(holder, position);
         holder.mRatingBar.setRating(mPoolTables.get(position).getReview());
+        setDescription(holder, position);
         setDistance(holder, position);
     }
 

@@ -1,6 +1,7 @@
 package marcook_pool.pool_finder.util.managers;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
@@ -14,17 +15,18 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import marcook_pool.pool_finder.R;
+import marcook_pool.pool_finder.fragments.SubmitTableFragment;
 
 /**
  * Created by Carson on 28/11/2016.
  * Used to get user location for a table.
  */
 public class TableLocationManager extends Service implements LocationListener {
-    private final String TAG = "TableLocationManager";
 
     public static final double FLAG_NO_LAT = 0;
     public static final double FLAG_NO_LONG = 0;
@@ -55,13 +57,19 @@ public class TableLocationManager extends Service implements LocationListener {
     //haveLocationPermission() checks for permission but IDE doesn't realize that and gives warning
     public void getLocation() {
         try {
-            if (canGetLocation() && haveLocationPermission()) {
+            if (!haveLocationPermission()) {
+                ActivityCompat.requestPermissions((Activity) mContext,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        SubmitTableFragment.MY_PERMISSIONS_REQUEST_FINE_LOCATION);
+            } else if (!canGetLocation()) { //location not turned on
+                promptTurnOnGps();
+            } else if (canGetLocation() && haveLocationPermission()) {
                 mLocationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER,
                         MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                 Location location = mLocationManager.getLastKnownLocation(android.location.LocationManager.NETWORK_PROVIDER);
                 mLatitude = location.getLatitude();
                 mLongitude = location.getLongitude();
-                Log.d("locationmanager", "test: " + mLatitude);
+                stopGettingLocation();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +81,7 @@ public class TableLocationManager extends Service implements LocationListener {
      * sends them to the settings screen to turn it on.
      * Public so that this can be done at will throughout the app.
      */
-    public void promptTurnOnGps() {
+    private void promptTurnOnGps() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
         alertDialog.setTitle(mContext.getString(R.string.gps_off))
@@ -99,7 +107,7 @@ public class TableLocationManager extends Service implements LocationListener {
      */
     @SuppressWarnings("all")
     //haveLocationPermission() checks for permission but IDE doesn't realize that and gives warning
-    public void stopUsingGPS() {
+    private void stopGettingLocation() {
         if (mLocationManager != null && haveLocationPermission()) {
             mLocationManager.removeUpdates(TableLocationManager.this);
         }
@@ -130,7 +138,7 @@ public class TableLocationManager extends Service implements LocationListener {
      *
      * @return True if can get location (network or GPS), else false
      */
-    public boolean canGetLocation() {
+    private boolean canGetLocation() {
         return mIsLocationEnabled;
     }
 
@@ -139,7 +147,7 @@ public class TableLocationManager extends Service implements LocationListener {
      *
      * @return True if have permission, false if not.
      */
-    public boolean haveLocationPermission() {
+    private boolean haveLocationPermission() {
         return ContextCompat.checkSelfPermission(mContext,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
