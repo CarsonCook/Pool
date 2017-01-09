@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
 import marcook_pool.pool_finder.R;
 import marcook_pool.pool_finder.util.managers.TableLocationManager;
@@ -89,7 +91,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
             return;
         }
         double distance = TableLocationManager.getDistanceBetweenLatLongPair(mLatitude, mLongitude, tableLat, tableLong);
-        String displayDistance = String.valueOf(distance) + " km";
+        String displayDistance;
+        DecimalFormat df = new DecimalFormat("###.##"); //rounds to 2 decimals places on df.format() call
+        if (distance >= 1) { //show km
+            displayDistance = String.valueOf(df.format(distance)) + " km";
+        } else { //show m
+            displayDistance = String.valueOf(df.format(distance * 1000)) + " m"; //*1000 converts m to km
+        }
         holder.mDistance.setText(displayDistance);
     }
 }
